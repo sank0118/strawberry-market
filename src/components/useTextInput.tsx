@@ -1,4 +1,4 @@
-"use clinet";
+"use client";
 
 import {
   ChangeEvent,
@@ -25,7 +25,6 @@ const useTextInput = () => {
     () => setTimeout(() => ref.current?.focus(), 100),
     []
   );
-
   const inputId = useId();
 
   const TextInput = useCallback(
@@ -33,8 +32,8 @@ const useTextInput = () => {
       label,
       labelClassName,
       onChangeText,
-      containerClassName,
       contentClassName,
+      containerClassName,
       ...props
     }: Props) => {
       return (
@@ -47,21 +46,24 @@ const useTextInput = () => {
               {label}
             </label>
           )}
-          <div className={contentClassName}>
+          <div className={twMerge("h-12", contentClassName)}>
             <input
               {...props}
               id={props?.id ?? inputId}
               onChange={(e) => {
                 if (onChangeText) {
-                  onChangeText(e.target.value, e);
+                  return onChangeText(e.target.value, e);
                 }
                 if (props?.onChange) {
-                  props?.onChange(e);
+                  props.onChange(e);
                 }
               }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              className={twMerge("flex-1 w-full", props?.className)}
+              className={twMerge(
+                "flex-1 w-full outline-none px-2.5 h-12 rounded border border-gray-200 focus:text-theme focus:border-theme",
+                props?.className
+              )}
               ref={ref}
             />
           </div>

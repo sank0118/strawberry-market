@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import CustomLayout from "@/CustomLayout";
+import CustomLayout from "./CustomLayout";
 
 export const metadata: Metadata = {
   title: "딸기 마켓",
