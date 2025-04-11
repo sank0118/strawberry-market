@@ -1,14 +1,23 @@
 "use client";
 
-import { Form, useTextInput } from "@/components";
+import { Form, Loading, useTextInput } from "@/components";
 import {
   emailValidator,
   korValidator,
   mobileValidator,
   passwordValidator,
 } from "@/utils";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
-import JusoComponent from "./JusoComponent";
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import JusoComponent, { JusoRef } from "./JusoComponent";
+import { AUTH } from "@/contexts";
+import { useNavi } from "@/hooks";
 
 // SSR 나중에 해보기
 
@@ -21,23 +30,25 @@ const Signup = () => {
   const [signupProps, setSignupPros] = useState<SignupProps>({
     createdAt: new Date(),
     email: "test@test.com",
-    name: "",
-    password: "",
+    name: "김딸기",
+    password: "123123",
     sellerId: null,
     uid: "",
     jusoes: [],
-    mobile: "010",
+    mobile: "01012341234",
   });
 
   const { email, name, password, jusoes, mobile } = signupProps;
 
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("123123");
 
   const Email = useTextInput();
   const Password = useTextInput();
   const ConfirmPassword = useTextInput();
   const Name = useTextInput();
   const Mobile = useTextInput();
+
+  const jusoRef = useRef<JusoRef>(null);
 
   const onChangeS = useCallback(
     (value: string, event: ChangeEvent<HTMLInputElement>) => {
@@ -66,9 +77,70 @@ const Signup = () => {
     return null;
   }, [password, confirmPassword]);
 
+  const { user, signup, isPending } = AUTH.use();
+
+  const navi = useNavi();
+
+  const onSubmit = useCallback(async () => {
+    if (nameMessage) {
+      alert(nameMessage);
+      return Name.focus();
+    }
+
+    if (mobileMessage) {
+      alert(mobileMessage);
+      return Mobile.focus();
+    }
+
+    if (emailMessage) {
+      alert(emailMessage);
+      return Email.focus();
+    }
+
+    if (passwordMessage) {
+      alert(passwordMessage);
+      return Password.focus();
+    }
+
+    if (confirmPasswordMessage) {
+      alert(confirmPasswordMessage);
+      return ConfirmPassword.focus();
+    }
+
+    if (jusoes.length === 0) {
+      alert("기본 배송지를 입력해주세요.");
+      jusoRef.current?.openModal();
+      jusoRef.current?.focusKeyword();
+      return;
+    }
+
+    const { success, message } = await signup(signupProps);
+    if (!success || message) {
+      return alert(message ?? "회원가입 시 문제가 발생했습니다.");
+    }
+
+    alert("회원가입을 축하합니다.");
+  }, [
+    nameMessage,
+    mobileMessage,
+    passwordMessage,
+    confirmPasswordMessage,
+    emailMessage,
+    jusoes,
+    signup,
+    signupProps,
+    jusoRef,
+  ]);
+
+  useEffect(() => {
+    console.log(signupProps, user);
+  }, [signupProps, user]);
+
   return (
-    <div>
+    <div className="">
+      {isPending && <Loading />}
       <Form
+        onSubmit={onSubmit}
         className="border w-full p-5"
         Submit={<button className="primary flex-1">회원가입</button>}
       >
@@ -122,6 +194,7 @@ const Signup = () => {
       <JusoComponent
         jusoes={jusoes}
         onChangeJ={(j) => setSignupPros((prev) => ({ ...prev, jusoes: j }))}
+        ref={jusoRef}
       />
     </div>
   );

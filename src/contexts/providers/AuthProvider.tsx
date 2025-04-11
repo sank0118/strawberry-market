@@ -10,6 +10,8 @@ import {
 } from "react";
 import { AUTH } from "../react.context";
 import { authService, dbService, FBCollection } from "@/lib";
+import { assert } from "console";
+import { GiStrawberry } from "react-icons/gi";
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
   const [initialized, setInitialized] = useState(false);
@@ -86,12 +88,12 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
             //! 회원가입 정보를 데이터베이스 저장
             //@ts-ignore
             delete newUser.password;
-            const storedUser: User = { ...newUser };
+            const storedUser: User = { ...newUser, uid: user.uid };
             console.log(storedUser);
 
             //@ts-ignore
-            delete storesUser.password;
-            await ref.doc(user.uid || storedUser.uid).set(storedUser);
+            delete storedUser.password;
+            await ref.doc(user.uid).set(storedUser);
 
             return resolve({ success: true });
           } catch (error: any) {
@@ -145,6 +147,30 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     console.log({ user });
   }, [user]);
 
+  useEffect(() => {
+    const subscribeUser = authService.onAuthStateChanged(async (fbUser) => {
+      if (!fbUser) {
+        console.log("not logged in");
+      } else {
+        const { uid } = fbUser;
+        const snap = await ref.doc(uid).get();
+        const data = snap.data() as User;
+        if (!data) {
+          console.log("no user data");
+        } else {
+          setUser(data ?? null);
+        }
+      }
+      setTimeout(() => {
+        setInitialized(true);
+      }, 1000);
+      setInitialized(true);
+    });
+
+    subscribeUser;
+    return subscribeUser;
+  }, []);
+
   return (
     <AUTH.Context.Provider
       value={{
@@ -158,7 +184,14 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
         user,
       }}
     >
-      {children}
+      {!initialized ? (
+        <div className="modal con justify-center items-center text-theme bg-white">
+          <GiStrawberry className="text-6xl" />
+          <h1 className="text-2xl font-black">딸기마켓</h1>
+        </div>
+      ) : (
+        children
+      )}
     </AUTH.Context.Provider>
   );
 };
