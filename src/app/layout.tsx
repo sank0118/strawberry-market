@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import CustomLayout from "./CustomLayout";
+import { AppProdiver } from "@/contexts";
 
 export const metadata: Metadata = {
   title: "딸기 마켓",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <CustomLayout>{children}</CustomLayout>
+        <AppProdiver>
+          <CustomLayout>{children}</CustomLayout>
+        </AppProdiver>
       </body>
     </html>
   );

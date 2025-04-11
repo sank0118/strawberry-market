@@ -15,7 +15,9 @@ interface Props extends ComponentProps<"input"> {
   labelClassName?: string;
   contentClassName?: string;
   containerClassName?: string;
+  messageClassName?: string;
   onChangeText?: (value: string, event: ChangeEvent<HTMLInputElement>) => void;
+  message?: string | null;
 }
 
 const useTextInput = () => {
@@ -29,11 +31,13 @@ const useTextInput = () => {
 
   const TextInput = useCallback(
     ({
+      message,
       label,
       labelClassName,
       onChangeText,
       contentClassName,
       containerClassName,
+      messageClassName,
       ...props
     }: Props) => {
       return (
@@ -61,12 +65,20 @@ const useTextInput = () => {
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               className={twMerge(
-                "flex-1 w-full outline-none px-2.5 h-12 rounded border border-gray-200 focus:text-theme focus:border-theme",
+                "flex-1 w-full outline-none px-2.5 rounded border border-gray-200 focus:text-theme focus:border-theme",
                 props?.className
               )}
               ref={ref}
             />
           </div>
+          {message && (
+            <label
+              htmlFor={props?.id ?? inputId}
+              className={twMerge("text-red-500 text-xs", messageClassName)}
+            >
+              {message}
+            </label>
+          )}
         </div>
       );
     },

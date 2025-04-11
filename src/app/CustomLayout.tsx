@@ -2,7 +2,7 @@
 import { useTextInput } from "@/components";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PropsWithChildren, useState, useMemo } from "react";
+import { PropsWithChildren, useState, useMemo, useCallback } from "react";
 import { IconType } from "react-icons";
 import { GiStrawberry } from "react-icons/gi";
 import {
