@@ -10,7 +10,6 @@ import {
 } from "react";
 import { AUTH } from "../react.context";
 import { authService, dbService, FBCollection } from "@/lib";
-import { assert } from "console";
 import { GiStrawberry } from "react-icons/gi";
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
@@ -89,7 +88,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
             //@ts-ignore
             delete newUser.password;
             const storedUser: User = { ...newUser, uid: user.uid };
-            console.log(storedUser);
 
             //@ts-ignore
             delete storedUser.password;
@@ -129,7 +127,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
             if (!user) {
               return resolve({
                 message:
-                  "로그인 한 유저만 이용 가능한 기능입니다. 로그인을 하시겠습니까?",
+                  "로그인 한 유저만 사용할 수 잇는 기능입니다. 로그인 하시겠습니까?",
               });
             }
 
@@ -161,10 +159,10 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
           setUser(data ?? null);
         }
       }
+
       setTimeout(() => {
         setInitialized(true);
       }, 1000);
-      setInitialized(true);
     });
 
     subscribeUser;

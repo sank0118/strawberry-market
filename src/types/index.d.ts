@@ -12,13 +12,12 @@ interface Juso {
   nickname: string;
   roadAddr: string;
   id: string;
-  detail: string;
-  zipNo: string;
+  detail: string; // reset
+  zipNo: string; //postcode
 }
 
 interface Result {
   success?: boolean;
   message?: string;
 }
-
 type PromiseResult = Promise<Result>;

@@ -1,3 +1,4 @@
+import { HTMLAttributes } from "react";
 import { ImSpinner5 } from "react-icons/im";
 import { twMerge } from "tailwind-merge";
 
@@ -19,13 +20,14 @@ const Loading = ({
   return (
     <div
       className={twMerge(
-        "modal con z-1000 justify-center items-center",
+        "modal con z-50 justify-center items-center",
         container
       )}
     >
       <div
         className={twMerge(
-          "items-center bg-white p-10 border border-gray-200 shadow-xl rounded-2xl ",
+          "items-center",
+          "bg-white p-10 border border-gray-200 shadow-xl rounded-2xl",
           wrap
         )}
       >
