@@ -1,4 +1,3 @@
-import { HTMLAttributes } from "react";
 import { ImSpinner5 } from "react-icons/im";
 import { twMerge } from "tailwind-merge";
 

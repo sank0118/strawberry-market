@@ -11,6 +11,7 @@ import {
 import { AUTH } from "../react.context";
 import { authService, dbService, FBCollection } from "@/lib";
 import { GiStrawberry } from "react-icons/gi";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
   const [initialized, setInitialized] = useState(false);
@@ -18,6 +19,39 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
   const [isPending, startTransition] = useTransition();
 
   const ref = useMemo(() => dbService.collection(FBCollection.USERS), []);
+
+  const { data, error } = useQuery({
+    queryKey: ["user", user?.uid],
+    queryFn: async (): Promise<null | User> => {
+      if (!user) {
+        return null;
+      }
+      const snap = await ref.doc(user.uid).get();
+      const data = snap.data() as User | null;
+      return data;
+    },
+  });
+
+  //! re-validate -> invalidation
+  const queryClient = useQueryClient();
+
+  //! user 다시 받아오기
+  const caching = useCallback(() => {
+    const queryKey = ["user", user?.uid];
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, user]);
+
+  useEffect(() => {
+    if (error) {
+      console.log(error);
+    } else {
+      if (data) {
+        // console.log(data);
+
+        setUser(data);
+      }
+    }
+  }, [data, error]);
 
   const signin = useCallback(
     (email: string, password: string) =>
@@ -131,19 +165,23 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
               });
             }
 
+            //! firebase에 데이터 저장하는 로직
             await ref.doc(user.uid).update({ [target]: value });
+
+            //? client의 user 업데이트 // =>firebase 실시간 리스너 || react-query || setUser로 업데이트
+            // setUser({ ...user, [target]: value }); //제일 간단한 방법
+            caching();
+
             return resolve({ success: true });
           } catch (error: any) {
             return resolve({ message: error.message });
           }
         })
       ),
-    [ref]
+    [ref, user, caching]
   );
 
-  useEffect(() => {
-    console.log({ user });
-  }, [user]);
+  //! 실시간 리스너 안좋은점 : 실시간으로 계속 요청 날림
 
   useEffect(() => {
     const subscribeUser = authService.onAuthStateChanged(async (fbUser) => {
@@ -156,6 +194,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
         if (!data) {
           console.log("no user data");
         } else {
+          console.log(data);
           setUser(data ?? null);
         }
       }
@@ -165,7 +204,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
       }, 1000);
     });
 
-    subscribeUser;
     return subscribeUser;
   }, []);
 
