@@ -26,4 +26,8 @@
   .modal.con {
     @apply fixed top-0 left-0 w-full h-screen z-10;
   }
+  /* 
+  .themeButton {
+    @apply bg-[#C4E2DA] items-center justify-center flex rounded-full h-12 w-12 cursor-pointer hover:bg-[#C4E2DA]/80 focus:bg-[#C4E2DA]/70;
+  } */
 }
